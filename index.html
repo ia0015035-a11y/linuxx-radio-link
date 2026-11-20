@@ -1,0 +1,29 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LinuxX Radio</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(900px 500px at 50% -10%,#2a1f5c,#0b1020);font-family:system-ui,Tahoma,sans-serif;color:#eaf0ff}
+.c{width:min(92vw,420px);padding:28px 22px;border-radius:26px;background:#141b33cc;border:1px solid #ffffff22;text-align:center}
+h1{margin:0 0 4px;font-size:22px}small{color:#8fa0c8}
+.eq{display:flex;gap:5px;justify-content:center;align-items:flex-end;height:46px;margin:22px 0}
+.eq i{width:7px;height:8px;background:linear-gradient(#4fe3d6,#a78bff);border-radius:4px}
+.on .eq i{animation:b 1s infinite ease-in-out}.eq i:nth-child(2n){animation-delay:.2s}.eq i:nth-child(3n){animation-delay:.4s}
+@keyframes b{50%{height:44px}}
+button{width:100%;padding:14px;border:0;border-radius:16px;font-size:16px;font-weight:700;color:#fff;background:linear-gradient(90deg,#00b8d4,#7c4dff);cursor:pointer}
+#now{margin-top:16px;font-size:14px;min-height:20px}#q{margin-top:6px;color:#8fa0c8;font-size:12px}
+</style></head><body><div class="c" id="c">
+<h1>🎧 LinuxX Radio</h1><small>رادیو زندهٔ روم</small>
+<div class="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<button id="b">▶ پخش</button><div id="now">در حال اتصال…</div><div id="q"></div>
+<audio id="a" preload="none"></audio></div>
+<script>
+const a=document.getElementById('a'),b=document.getElementById('b'),now=document.getElementById('now'),q=document.getElementById('q'),c=document.getElementById('c');
+let base='';
+async function link(){try{const r=await fetch('url.json?'+Date.now());const j=await r.json();base=(j.direct||j.tunnel||j.stream||'').replace(/\/$/,'');}catch(e){}
+ if(!base)now.textContent='رادیو الان خاموش است';else if(now.textContent==='در حال اتصال…')now.textContent='آمادهٔ پخش';}
+async function st(){if(!base)return;try{const j=await (await fetch(base+'/status')).json();
+ now.textContent=j.now?('▶ '+j.now.title):'آهنگی در حال پخش نیست';q.textContent='شنونده‌ها: '+j.listeners+(j.queue.length?'  •  صف: '+j.queue.length:'');}catch(e){}}
+b.onclick=()=>{if(!base){link();return}if(a.paused){a.src=base+'/stream.mp3?'+Date.now();a.play();b.textContent='⏸ توقف';c.classList.add('on')}else{a.pause();a.removeAttribute('src');b.textContent='▶ پخش';c.classList.remove('on')}};
+link().then(st);setInterval(link,60000);setInterval(st,8000);
+</script></body></html>
